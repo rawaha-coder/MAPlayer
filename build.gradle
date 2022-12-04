@@ -2,7 +2,7 @@
 buildscript {
 
     ext{
-        roomVersion = "2.4.2"
+        roomVersion = "2.4.3"
         navigationVersion = "2.5.3"
         lifecycleVersion = "2.5.1"
     }
