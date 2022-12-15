@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import android.view.Menu
+import android.widget.ImageView
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -22,15 +24,21 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
-import com.hybcode.maplayer.data.model.Song
+import com.hybcode.maplayer.common.data.model.Song
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import com.hybcode.maplayer.playback.PlaybackViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -139,22 +147,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setSupportActionBar(binding.appBarMain.toolbar)
+        setSupportActionBar(binding.toolbar)
 
-        binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
-            ), drawerLayout
-        )
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_queue, R.id.nav_library, R.id.nav_songs),
+            drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
@@ -167,6 +169,24 @@ class MainActivity : AppCompatActivity() {
         )
         mediaBrowser.connect()
         createChannel()
+
+        val mOnNavigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_queue -> {
+                    val action = MobileNavigationDirections.actionLibrary(0)
+                    navController.navigate(action)
+                }
+                R.id.nav_songs -> {
+                val action = MobileNavigationDirections.actionLibrary(1)
+                navController.navigate(action)
+            }
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
+        binding.navView.setNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        binding.navView.itemIconTintList = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -239,5 +259,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun play() = mediaController.transportControls.play()
+
+    fun insertArtwork(albumID: String?, view: ImageView) {var file: File? = null
+        if (albumID != null) {
+            val cw = ContextWrapper(this)
+            val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
+            file = File(directory, "$albumID.jpg")
+        }
+        Glide.with(this)
+                    .load(file ?: R.drawable.ic_launcher_foreground)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .centerCrop()
+                    .signature(ObjectKey(file?.path + file?.lastModified()))
+                    .override(600, 600)
+                    .into(view)
+    }
 
 }

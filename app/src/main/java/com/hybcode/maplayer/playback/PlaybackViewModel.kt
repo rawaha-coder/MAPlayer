@@ -2,7 +2,7 @@ package com.hybcode.maplayer.playback
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.hybcode.maplayer.data.model.Song
+import com.hybcode.maplayer.common.data.model.Song
 
 class PlaybackViewModel : ViewModel() {
     var currentPlayQueue = MutableLiveData<List<Pair<Int, Song>>>()

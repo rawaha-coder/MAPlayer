@@ -1,8 +1,8 @@
-package com.hybcode.maplayer.data.db
+package com.hybcode.maplayer.common.data.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.hybcode.maplayer.data.model.Song
+import com.hybcode.maplayer.common.data.model.Song
 
 @Dao
 interface MusicDao {
