@@ -1,5 +1,6 @@
 package com.hybcode.maplayer
 
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.ProgressDialog.show
@@ -16,8 +17,10 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import android.view.Menu
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.PopupMenu
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
@@ -62,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mediaBrowser: MediaBrowserCompat
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var musicViewModel: MusicViewModel
+    private lateinit var searchView: SearchView
 
     private val connectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
@@ -210,13 +214,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        return true
+        val searchItem = menu.findItem(R.id.search)
+        searchView = searchItem!!.actionView as SearchView
+        searchView.setOnSearchClickListener {
+            findNavController(R.id.nav_host_fragment).navigate(R.id.nav_search)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onBackPressed() {
+// TODO: Handle closure of the currently playing fragment
+        if (!searchView.isIconified) {
+            searchView.isIconified = true
+            searchView.onActionViewCollapsed()
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = findNavController(R.id.nav_host_fragment)
+        if (!searchView.isIconified) {
+            searchView.isIconified = true
+            searchView.onActionViewCollapsed()
+        }
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
@@ -305,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
                     R.id.edit_metadata -> {
-                    val action = SongsFragmentDirections.actionEditSong(song)
+                    val action = MobileNavigationDirections.actionEditSong(song)
                     findNavController(R.id.nav_host_fragment).navigate(action)
                     true
                 }
@@ -405,6 +425,15 @@ class MainActivity : AppCompatActivity() {
         playQueue.add(index + 1, queueItem)
         playbackViewModel.currentPlayQueue.value = playQueue
         Toast.makeText(this, getString(R.string.added_to_queue, song.title), Toast.LENGTH_SHORT).show()
+    }
+
+    fun hideKeyboard(activity: Activity) {
+        val inputManager = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val currentFocusedView = activity.currentFocus
+        if (currentFocusedView != null) inputManager.hideSoftInputFromWindow(
+            currentFocusedView.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
     }
 
 }
