@@ -13,6 +13,7 @@ import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.common.data.model.Song
 import com.hybcode.maplayer.databinding.FragmentSongsBinding
 import com.hybcode.maplayer.common.MusicViewModel
+import java.util.*
 
 class SongsFragment : Fragment() {
 
@@ -38,14 +39,16 @@ class SongsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.recyclerView.layoutManager = LinearLayoutManager(activity)
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-// TODO: Initialise the SongsAdapter class here
+        songsAdapter = SongsAdapter(callingActivity)
+        binding.recyclerView.adapter = songsAdapter
+        songsAdapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         musicViewModel = ViewModelProvider(this)[MusicViewModel::class.java]
         musicViewModel.allSongs.observe(viewLifecycleOwner) { songs ->
             songs?.let {
                 if (it.isNotEmpty() || completeLibrary.isNotEmpty()) processSongs(it)
             }
         }
-// Shuffle the music library then play it
+
         binding.fab.setOnClickListener {
             callingActivity.playNewSongs(completeLibrary, 0, true)
         }
@@ -56,5 +59,38 @@ class SongsFragment : Fragment() {
                         else if (dy < 0 && binding.fab.visibility != View.VISIBLE) binding.fab.show()
                     }
                 })
+    }
+
+    private fun processSongs(songList: List<Song>) {
+        if (!isProcessing) {
+            isProcessing = true
+            completeLibrary = songList.sortedBy { song ->
+                song.title.uppercase(Locale.ROOT)
+            }.toMutableList()
+            val songs = songsAdapter.songs
+            songsAdapter.songs = completeLibrary
+            when {
+                songs.isEmpty() -> songsAdapter.notifyItemRangeInserted(0, completeLibrary.size)
+                completeLibrary.size > songs.size -> {
+                    val difference = completeLibrary - songs.toSet()
+                    for (s in difference) {
+                        val index = completeLibrary.indexOfFirst {
+                            it.songID == s.songID
+                        }
+                        if (index != -1) songsAdapter.notifyItemInserted(index)
+                    }
+                }
+                completeLibrary.size < songs.size -> {
+                val difference = songs - completeLibrary.toSet()
+                for (s in difference) {
+                    val index = songs.indexOfFirst {
+                        it.songID == s.songID
+                    }
+                    if (index != -1) songsAdapter.notifyItemRemoved(index)
+                }
+            }
+            }
+            isProcessing = false
+        }
     }
 }

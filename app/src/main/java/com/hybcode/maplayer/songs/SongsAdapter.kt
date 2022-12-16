@@ -26,7 +26,7 @@ class SongsAdapter(private val activity: MainActivity):
             binding.root.isClickable = true
             binding.root.setOnClickListener(this)
             binding.root.setOnLongClickListener{
-// TODO: Open options dialog
+                activity.showSongPopup(it, songs[layoutPosition])
                 return@setOnLongClickListener true
             }
         }
@@ -44,7 +44,7 @@ class SongsAdapter(private val activity: MainActivity):
         holder.mTitle.text = current.title
         holder.mArtist.text = current.artist
         holder.mMenu.setOnClickListener {
-// TODO: Open options dialog
+            activity.showSongPopup(it, current)
         }
     }
     override fun getItemCount() = songs.size}

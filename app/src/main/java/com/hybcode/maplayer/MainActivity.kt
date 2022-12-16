@@ -2,10 +2,12 @@ package com.hybcode.maplayer
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.ProgressDialog.show
 import android.content.ComponentName
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
@@ -13,7 +15,10 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
 import android.view.Menu
+import android.view.View
 import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
@@ -25,6 +30,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.preference.PreferenceManager
@@ -32,6 +38,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
+import com.hybcode.maplayer.common.MusicViewModel
 import com.hybcode.maplayer.common.data.model.Song
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import com.hybcode.maplayer.playback.PlaybackViewModel
@@ -39,6 +46,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
 
@@ -53,6 +61,7 @@ class MainActivity : AppCompatActivity() {
     var playQueue = mutableListOf<Pair<Int, Song>>()
     private lateinit var mediaBrowser: MediaBrowserCompat
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var musicViewModel: MusicViewModel
 
     private val connectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
@@ -187,6 +196,17 @@ class MainActivity : AppCompatActivity() {
         binding.navView.setNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         binding.navView.itemIconTintList = null
+
+        musicViewModel = ViewModelProvider(this)[MusicViewModel::class.java]
+
+        playbackViewModel.currentPlayQueue.observe(this) { queue ->
+            queue?.let {
+                playQueue = queue.toMutableList()
+            }
+        }
+        playbackViewModel.currentlyPlayingQueueID.observe(this) {
+                    currentlyPlayingQueueID = it
+                }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -273,6 +293,118 @@ class MainActivity : AppCompatActivity() {
                     .signature(ObjectKey(file?.path + file?.lastModified()))
                     .override(600, 600)
                     .into(view)
+    }
+
+    fun showSongPopup(view: View, song: Song) {
+        PopupMenu(this, view).apply {
+            inflate(R.menu.song_options)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.play_next -> {
+                        playNext(song)
+                        true
+                    }
+                    R.id.edit_metadata -> {
+                    val action = SongsFragmentDirections.actionEditSong(song)
+                    findNavController(R.id.nav_host_fragment).navigate(action)
+                    true
+                }
+                    else -> super.onOptionsItemSelected(it)
+                }
+            }
+            show()
+        }
+    }
+
+    fun getArtworkFile(filename: String): File {
+        val cw = ContextWrapper(application)
+        val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
+        return File(directory, "$filename.jpg")
+    }
+
+    fun saveImage(bitmap: Bitmap, path: File) {
+        try {
+            FileOutputStream(path).apply {
+// Use the compress method on the BitMap object to write image to the OutputStream
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, this)
+                close()
+            }
+        } catch (ignore: Exception) { }
+    }
+
+    fun updateSongInfo(song: Song) = lifecycleScope.launch(Dispatchers.Default) {
+        musicViewModel.updateMusicInfo(song)
+// See if the play queue needs to be updated
+        if (playQueue.isNotEmpty()) {
+            val newQueue = playQueue
+            fun findIndex(): Int {
+                return newQueue.indexOfFirst {
+                    it.second.songID == song.songID
+                }
+            }
+            // HashMap key = queue index, value = queue item ID
+            val queueIndexQueueIDMap = HashMap<Int, Int>()
+            do {
+                val index = findIndex()
+                if (index != -1) {
+                    queueIndexQueueIDMap[index] = playQueue[index].first
+                    newQueue.removeAt(index)
+                }
+            } while (index != -1)
+// Add the affected queue items (with updated metadata) back to the play queue
+            for ((index, queueID) in queueIndexQueueIDMap) {
+                val queueItem = Pair(queueID, song)
+                newQueue.add(index, queueItem)
+            }
+            playbackViewModel.currentPlayQueue.postValue(newQueue)
+        }
+    }
+
+    fun skipToQueueItem(position: Int) {
+        currentlyPlayingQueueID = playQueue[position].first
+        lifecycleScope.launch {
+            updateCurrentlyPlaying()
+            play()
+        }
+    }
+
+    fun removeQueueItem(index: Int) {
+        if (playQueue.isNotEmpty() && index != -1) {
+// Check if the currently playing song is being removed from the play queue
+            val currentlyPlayingSongRemoved = playQueue[index].first == currentlyPlayingQueueID
+            playQueue.removeAt(index)
+            if (currentlyPlayingSongRemoved) {
+                currentlyPlayingQueueID = when {
+                    playQueue.isEmpty() -> {
+                        val mediaController = MediaControllerCompat.getMediaController(this)
+                        mediaController.transportControls.stop()
+                        return
+                    }
+                    playQueue.size == index -> playQueue[0].first
+                    else -> playQueue[index].first
+                }
+                lifecycleScope.launch {
+                            updateCurrentlyPlaying()
+                            if (playbackState == STATE_PLAYING) play()
+                        }
+            }
+            playbackViewModel.currentPlayQueue.value = playQueue
+        }
+    }
+
+    private fun playNext(song: Song) {
+        val sortedQueue = playQueue.sortedByDescending {
+            it.first
+        }
+        val highestQueueID = if (sortedQueue.isNotEmpty()) sortedQueue[0].first
+        else -1
+        val queueItem = Pair(highestQueueID + 1, song)
+        val index = playQueue.indexOfFirst {
+            it.first == currentlyPlayingQueueID
+        }
+        playQueue.add(index + 1, queueItem)
+        playbackViewModel.currentPlayQueue.value = playQueue
+        Toast.makeText(this, getString(R.string.added_to_queue, song.title), Toast.LENGTH_SHORT).show()
     }
 
 }
