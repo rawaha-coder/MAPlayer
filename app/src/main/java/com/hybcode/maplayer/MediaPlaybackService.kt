@@ -29,7 +29,7 @@ import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
 import androidx.media.MediaBrowserServiceCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.hybcode.maplayer.data.model.Song
+import com.hybcode.maplayer.common.data.model.Song
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

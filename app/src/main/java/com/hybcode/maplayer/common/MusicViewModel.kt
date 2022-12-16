@@ -1,12 +1,11 @@
-package com.hybcode.maplayer.musiclibrary
+package com.hybcode.maplayer.common
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.hybcode.maplayer.data.MusicRepository
-import com.hybcode.maplayer.data.db.MusicDatabase
-import com.hybcode.maplayer.data.model.Song
+import com.hybcode.maplayer.common.data.db.MusicDatabase
+import com.hybcode.maplayer.common.data.model.Song
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
