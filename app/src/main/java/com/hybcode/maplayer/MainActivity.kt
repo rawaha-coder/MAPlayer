@@ -1,20 +1,23 @@
 package com.hybcode.maplayer
 
+import android.Manifest
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.ProgressDialog.show
-import android.content.ComponentName
-import android.content.Context
-import android.content.ContextWrapper
-import android.content.SharedPreferences
+import android.content.*
+import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.*
+import android.util.Size
 import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -32,7 +35,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
@@ -42,13 +50,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
 import com.hybcode.maplayer.common.MusicViewModel
+import com.hybcode.maplayer.common.data.db.MusicDatabase
 import com.hybcode.maplayer.common.data.model.Song
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import com.hybcode.maplayer.playback.PlaybackViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var musicViewModel: MusicViewModel
     private lateinit var searchView: SearchView
+    private var currentPlaybackPosition = 0
+    private var currentPlaybackDuration = 0
 
     private val connectionCallbacks = object : MediaBrowserCompat.ConnectionCallback() {
         override fun onConnected() {
@@ -211,6 +221,99 @@ class MainActivity : AppCompatActivity() {
         playbackViewModel.currentlyPlayingQueueID.observe(this) {
                     currentlyPlayingQueueID = it
                 }
+
+        playbackViewModel.currentPlaybackPosition.observe(this) { position ->
+            position?.let {
+                currentPlaybackPosition = it
+            }
+        }
+        playbackViewModel.currentPlaybackDuration.observe(this) { duration ->
+                    duration?.let {
+                        currentPlaybackDuration = it
+                    }
+                }
+
+        musicViewModel.allSongs.observe(this) { songs ->
+            songs.let { completeLibrary = it.toMutableList() }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        volumeControlStream = AudioManager.STREAM_MUSIC
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED) {
+            libraryMaintenance()
+        } else ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 1)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults:
+    IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED) {
+            libraryMaintenance()
+        } else {
+            Toast.makeText(this, getString(R.string.permission_required), Toast.LENGTH_LONG).show()
+            finish()
+        }
+    }
+
+    private fun libraryMaintenance() = lifecycleScope.launch(Dispatchers.Main) {
+        libraryRefresh()
+        if (completeLibrary.isNotEmpty()) {
+            val songsToDelete = checkLibrarySongsExistAsync().await()
+            if (songsToDelete.isNotEmpty()) deleteSongs(songsToDelete)
+        }
+    }
+
+    private fun checkLibrarySongsExistAsync(): Deferred<List<Song>> = lifecycleScope.async(Dispatchers.IO) {
+        var songsToBeDeleted = mutableListOf<Song>()
+        val projection = arrayOf(MediaStore.Audio.Media._ID)
+        val libraryCursor = musicQueryAsync(projection).await()
+        libraryCursor?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            songsToBeDeleted = completeLibrary.toMutableList()
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val indexOfSong = songsToBeDeleted.indexOfFirst { song: Song ->
+                    song.songID == id
+                }
+                if (indexOfSong != -1) songsToBeDeleted.removeAt(indexOfSong)
+            }
+        }
+        return@async songsToBeDeleted
+    }
+
+    private suspend fun deleteSongs(songs: List<Song>) {
+        for (s in songs) {
+// Remove all instances of the song from the play queue
+            if (playQueue.isNotEmpty()) {
+                do {
+                    val index = playQueue.indexOfFirst {
+                        it.second.songID == s.songID
+                    }
+                    if (index != -1) removeQueueItem(index)
+                } while (index != -1)
+            }
+            musicViewModel.deleteSong(s)
+        }
+        tidyArtwork(songs)
+    }
+
+    private suspend fun tidyArtwork(songs: List<Song>) {
+        val directory = ContextWrapper(application).getDir("albumArt", Context.MODE_PRIVATE)
+        val musicDatabase = MusicDatabase.getDatabase(this)
+        for (s in songs){
+            val artworkInUse = musicDatabase.musicDao().getAlbum(s.albumID)
+            if (artworkInUse.isNullOrEmpty()){
+                val path = File(directory, s.albumID + ".jpg")
+                if (path.exists()) path.delete()
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -224,7 +327,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-// TODO: Handle closure of the currently playing fragment
+        val id = findNavController(R.id.nav_controls_fragment).currentDestination?.id ?: 0
+        if (id == R.id.nav_currently_playing) {
+            findNavController(R.id.nav_controls_fragment).popBackStack()
+            hideSystemBars(false)
+        } else super.onBackPressed()
         if (!searchView.isIconified) {
             searchView.isIconified = true
             searchView.onActionViewCollapsed()
@@ -434,6 +541,176 @@ class MainActivity : AppCompatActivity() {
             currentFocusedView.windowToken,
             InputMethodManager.HIDE_NOT_ALWAYS
         )
+    }
+
+    fun playPauseControl() {
+        when (playbackState) {
+            STATE_PAUSED -> play()
+            STATE_PLAYING -> mediaController.transportControls.pause()
+            else -> {
+// Play the first song in the library if the play queue is currently empty
+                if (playQueue.isNullOrEmpty()) playNewSongs(completeLibrary, 0, false)
+                else {
+// It's possible a queue has been built without ever pressing play
+                    lifecycleScope.launch {
+                        updateCurrentlyPlaying()
+                        play()
+                    }
+                }
+            }
+        }
+    }
+
+    fun skipBack() = mediaController.transportControls.skipToPrevious()
+    fun skipForward() = mediaController.transportControls.skipToNext()
+
+    fun fastRewind() {
+        val pos = currentPlaybackPosition - 5000
+        if (pos < 0) skipBack()
+        else mediaController.transportControls.seekTo(pos.toLong())
+    }
+
+    fun fastForward() {
+        val pos = currentPlaybackPosition + 5000
+        if (pos > currentPlaybackDuration) skipForward()
+        else mediaController.transportControls.seekTo(pos.toLong())
+    }
+
+    fun hideSystemBars(hide: Boolean) {
+        val windowInsetsController = ViewCompat.getWindowInsetsController(window.decorView) ?: return
+        if (hide) {
+// Configure the behavior of the hidden system bars
+            windowInsetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+// Hide both the status bar and the navigation bar
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+// Hide the toolbar to prevent the SearchView keyboard inadvertently popping up
+            binding.toolbar.visibility = View.GONE
+        } else {
+            windowInsetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+            binding.toolbar.visibility = View.VISIBLE
+        }
+    }
+
+    // Returns true if the play queue has been shuffled, false if unshuffled
+    fun shuffleCurrentPlayQueue(): Boolean {
+        val isShuffled = sharedPreferences.getBoolean("shuffle", false)
+        if (playQueue.isNotEmpty()) {
+            if (isShuffled) {
+                playQueue.sortBy { it.first }
+                Toast.makeText(applicationContext, "Play queue unshuffled", Toast.LENGTH_SHORT).show()
+            } else {
+                val currentQueueItem = playQueue.find {
+                    it.first == currentlyPlayingQueueID
+                }
+                if (currentQueueItem != null) {
+                    playQueue.remove(currentQueueItem)
+                    playQueue.shuffle()
+                    playQueue.add(0, currentQueueItem)
+                    Toast.makeText(applicationContext, "Play queue shuffled", Toast.LENGTH_SHORT).show()
+                }
+            }
+            playbackViewModel.currentPlayQueue.value = playQueue
+        }
+        sharedPreferences.edit().apply {
+                    putBoolean("shuffle", !isShuffled)
+                    apply()
+                }
+        return !isShuffled
+    }
+
+    fun setRepeatMode(repeatMode: Int): SharedPreferences.Editor = sharedPreferences
+        .edit()
+        .apply {
+        putInt("repeat", repeatMode)
+        apply()
+    }
+
+    fun seekTo(position: Int) = mediaController.transportControls.seekTo(position.toLong())
+
+    private fun musicQueryAsync(projection: Array<String>): Deferred<Cursor?> =
+        lifecycleScope.async(Dispatchers.IO) {
+            val selection = MediaStore.Audio.Media.IS_MUSIC
+            val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
+            return@async application.contentResolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                selection,
+                null,
+                sortOrder
+            )
+        }
+
+    private suspend fun libraryRefresh() = lifecycleScope.launch(Dispatchers.IO) {
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TRACK,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.YEAR
+        )
+        val libraryCursor = musicQueryAsync(projection).await()
+        libraryCursor?.use { cursor ->
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
+            val trackColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
+            val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
+            val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
+            val albumIDColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val yearColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+// Check the song has not been added to library. Will return -1 if not in library
+                val indexOfSong = completeLibrary.indexOfFirst { song: Song ->
+                    song.songID == id
+                }
+                if (indexOfSong == -1) {
+                    var trackString = cursor.getString(trackColumn) ?: "1001"
+// We need the track value in the format 1xxx, where the first digit is the disc number
+                    val track = try {
+                        when (trackString.length) {
+                            4 -> trackString.toInt()
+                            in 1..3 -> {
+                                val numberNeeded = 4 - trackString.length
+                                trackString = when (numberNeeded) {
+                                    1 -> "1$trackString"
+                                    2 -> "10$trackString"
+                                    else -> "100$trackString"
+                                }
+                                trackString.toInt()
+                            }
+                            else -> 1001
+                        }
+                    } catch (e: NumberFormatException) {
+// If the track format is incorrect (e.g. "12/23") then simply set track to 1001
+                        1001
+                    }
+                    val title = cursor.getString(titleColumn) ?: "Unknown song"
+                    val artist = cursor.getString(artistColumn) ?: "Unknown artist"
+                    val album = cursor.getString(albumColumn) ?: "Unknown album"
+                    val year = cursor.getString(yearColumn) ?: "2000"
+                    val albumID = cursor.getString(albumIDColumn) ?: "unknown_album_ID"
+                    val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
+// URI needs to be converted to a string for storage
+                    val songUri = uri.toString()
+                    val file = getArtworkFile(albumID)
+// If artwork is not saved then try and extract artwork from the audio file
+                    if (!file.exists()) {
+                        val albumArt: Bitmap? = try {
+                            application.contentResolver.loadThumbnail(uri, Size(640, 640), null)
+                        } catch (e: FileNotFoundException) {
+                            null
+                        }
+                        if (albumArt != null) saveImage(albumArt, file)
+                    }
+                    val song = Song(id, track, title, artist, album, albumID, songUri, year)
+                    musicViewModel.insertSong(song)
+                }
+            }
+        }
     }
 
 }
