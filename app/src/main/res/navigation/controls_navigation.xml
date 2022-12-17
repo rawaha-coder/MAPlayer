@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@+id/nav_controls">
+    <fragment
+        android:id="@+id/nav_controls"
+        android:name="com.hybcode.maplayer.controls.ControlsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_controls" />
+    <fragment
+        android:id="@+id/nav_currently_playing"
+        android:name="com.hybcode.maplayer.playback.CurrentlyPlayingFragment"
+        android:label=""
+        tools:layout="@layout/fragment_currently_playing" />
+</navigation>
