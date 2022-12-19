@@ -3,7 +3,6 @@ package com.hybcode.maplayer.songs
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -17,7 +16,7 @@ import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.R
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.FragmentEditSongBinding
 import java.io.FileNotFoundException
 import java.io.IOException

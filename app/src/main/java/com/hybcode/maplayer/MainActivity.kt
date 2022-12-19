@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.ProgressDialog.show
 import android.content.*
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -26,7 +25,6 @@ import android.widget.PopupMenu
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -49,9 +47,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
-import com.hybcode.maplayer.common.MusicViewModel
-import com.hybcode.maplayer.common.data.db.MusicDatabase
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.presentation.MusicViewModel
+import com.hybcode.maplayer.common.data.MusicDatabase
+import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import com.hybcode.maplayer.playback.PlaybackViewModel
 import kotlinx.coroutines.*

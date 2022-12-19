@@ -1,4 +1,4 @@
-package com.hybcode.maplayer.common.data.model
+package com.hybcode.maplayer.common.domain.model
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

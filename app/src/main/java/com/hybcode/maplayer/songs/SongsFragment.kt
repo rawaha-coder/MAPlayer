@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hybcode.maplayer.MainActivity
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.FragmentSongsBinding
-import com.hybcode.maplayer.common.MusicViewModel
+import com.hybcode.maplayer.common.presentation.MusicViewModel
 import java.util.*
 
 class SongsFragment : Fragment() {

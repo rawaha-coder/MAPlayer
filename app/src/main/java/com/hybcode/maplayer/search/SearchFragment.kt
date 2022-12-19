@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.R
-import com.hybcode.maplayer.common.data.db.MusicDatabase
+import com.hybcode.maplayer.common.data.MusicDatabase
 import com.hybcode.maplayer.databinding.FragmentSearchBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

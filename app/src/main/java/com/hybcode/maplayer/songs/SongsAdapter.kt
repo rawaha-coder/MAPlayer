@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.hybcode.maplayer.MainActivity
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.SongPreviewBinding
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
 
