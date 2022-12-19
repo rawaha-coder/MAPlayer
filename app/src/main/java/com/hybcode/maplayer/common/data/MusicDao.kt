@@ -1,4 +1,4 @@
-package com.hybcode.maplayer.common.data.db
+package com.hybcode.maplayer.common.data
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

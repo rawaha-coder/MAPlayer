@@ -47,8 +47,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
-import com.hybcode.maplayer.common.MusicViewModel
-import com.hybcode.maplayer.common.data.db.MusicDatabase
+import com.hybcode.maplayer.common.presentation.MusicViewModel
+import com.hybcode.maplayer.common.data.MusicDatabase
 import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import com.hybcode.maplayer.playback.PlaybackViewModel

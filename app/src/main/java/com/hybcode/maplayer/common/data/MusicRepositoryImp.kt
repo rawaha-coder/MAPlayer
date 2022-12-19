@@ -1,8 +1,7 @@
 package com.hybcode.maplayer.common.data
 
 import androidx.lifecycle.LiveData
-import com.hybcode.maplayer.common.MusicRepository
-import com.hybcode.maplayer.common.data.db.MusicDao
+import com.hybcode.maplayer.common.domain.repository.MusicRepository
 import com.hybcode.maplayer.common.domain.model.Song
 
 class MusicRepositoryImp(private val musicDao: MusicDao): MusicRepository {

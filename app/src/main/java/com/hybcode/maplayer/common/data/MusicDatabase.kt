@@ -1,4 +1,4 @@
-package com.hybcode.maplayer.common.data.db
+package com.hybcode.maplayer.common.data
 
 import android.content.Context
 import androidx.room.Database

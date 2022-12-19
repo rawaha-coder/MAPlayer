@@ -1,7 +1,6 @@
-package com.hybcode.maplayer.common
+package com.hybcode.maplayer.common.domain.repository
 
 import androidx.lifecycle.LiveData
-import com.hybcode.maplayer.common.data.db.MusicDao
 import com.hybcode.maplayer.common.domain.model.Song
 
 interface MusicRepository {
