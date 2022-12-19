@@ -17,14 +17,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.R
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.FragmentCurrentlyPlayingBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.navigation.fragment.findNavController
-import android.support.v4.media.session.PlaybackStateCompat.*
 import android.widget.PopupMenu
 import androidx.navigation.findNavController
 

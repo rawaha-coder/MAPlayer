@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.R
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 
 class PlayQueueAdapter(private val fragment: PlayQueueFragment, private val activity: MainActivity):
     RecyclerView.Adapter<PlayQueueAdapter.PlayQueueViewHolder>() {

@@ -2,21 +2,15 @@ package com.hybcode.maplayer.common
 
 import androidx.lifecycle.LiveData
 import com.hybcode.maplayer.common.data.db.MusicDao
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 
-class MusicRepository(private val musicDao: MusicDao) {
+interface MusicRepository {
 
-    val allSongs: LiveData<List<Song>> = musicDao.getAllSongs()
+    val allSongs: LiveData<List<Song>>
 
-    suspend fun insertSong(song: Song) {
-        musicDao.insert(song)
-    }
+    suspend fun insertSong(song: Song)
     
-    suspend fun deleteSong(song: Song) {
-        musicDao.delete(song)
-    }
+    suspend fun deleteSong(song: Song)
 
-    suspend fun updateSong(song: Song){
-        musicDao.update(song)
-    }
+    suspend fun updateSong(song: Song)
 }

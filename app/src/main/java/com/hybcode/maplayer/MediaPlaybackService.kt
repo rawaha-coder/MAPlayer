@@ -20,7 +20,6 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.text.TextUtils
-import android.view.Display
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
@@ -29,7 +28,7 @@ import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
 import androidx.media.MediaBrowserServiceCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.hybcode.maplayer.common.data.model.Song
+import com.hybcode.maplayer.common.domain.model.Song
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException

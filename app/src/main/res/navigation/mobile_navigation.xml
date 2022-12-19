@@ -37,7 +37,7 @@
         tools:layout="@layout/fragment_edit_song">
         <argument
             android:name="song"
-            app:argType="com.hybcode.maplayer.common.data.model.Song"
+            app:argType="com.hybcode.maplayer.common.domain.model.Song"
             app:nullable="true" />
     </fragment>
     <action
