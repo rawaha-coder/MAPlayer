@@ -1,4 +1,4 @@
-package com.hybcode.maplayer
+package com.hybcode.maplayer.common.services
 
 import android.app.PendingIntent
 import android.content.*
@@ -28,6 +28,7 @@ import androidx.media.AudioManagerCompat.AUDIOFOCUS_GAIN
 import androidx.media.MediaBrowserServiceCompat
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.hybcode.maplayer.R
 import com.hybcode.maplayer.common.domain.model.Song
 import java.io.File
 import java.io.FileInputStream
