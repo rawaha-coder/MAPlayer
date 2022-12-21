@@ -327,137 +327,87 @@ class MediaPlaybackService : MediaBrowserServiceCompat(), OnErrorListener {
     }
 
     private fun setCurrentMetadata() {
-//        val metadata = MediaMetadataCompat.Builder().apply {
-//            putString(
-//                MediaMetadataCompat.METADATA_KEY_TITLE,
-//                currentlyPlayingSong?.title
-//            )
-//            putString(
-//                MediaMetadataCompat.METADATA_KEY_ARTIST,
-//                currentlyPlayingSong?.artist
-//            )
-//            putString(
-//                MediaMetadataCompat.METADATA_KEY_ALBUM,
-//                currentlyPlayingSong?.album
-//            )
-//            putBitmap(
-//                MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-//                getArtwork(currentlyPlayingSong?.albumID) ?: BitmapFactory.decodeResource(
-//                    application.resources,
-//                    R.drawable.ic_launcher_foreground
-//                )
-//            )
-//        }.build()
         val metadata = getMediaMetadata(currentlyPlayingSong, application, applicationContext)
         mMediaSessionCompat.setMetadata(metadata)
     }
 
-//    private fun getArtwork(albumArtwork: String?): Bitmap? {
-//        try {
-//            return BitmapFactory.Options().run {
-//                inJustDecodeBounds = true
-//                val cw = ContextWrapper(applicationContext)
-//                val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
-//                val f = File(directory, "$albumArtwork.jpg")
-//                BitmapFactory.decodeStream(FileInputStream(f))
-//                inSampleSize = calculateInSampleSize(this)
-//                inJustDecodeBounds = false
-//                BitmapFactory.decodeStream(FileInputStream(f))
-//            }
-//        } catch (ignore: FileNotFoundException) {
-//
-//        }
-//        return null
-//    }
-
-//    private fun calculateInSampleSize(options: BitmapFactory.Options): Int {
-//        val reqWidth = 100
-//        val reqHeight = 100
-//        val (height: Int, width: Int) = options.run { outHeight to outWidth }
-//        var inSampleSize = 1
-//        if (height > reqHeight || width > reqWidth) {
-//            val halfHeight: Int = height / 2
-//            val halfWidth: Int = width / 2
-//            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-//                inSampleSize *= 2
-//            }
-//        }
-//        return inSampleSize
-//    }
-
     private fun showNotification(isPlaying: Boolean) {
-        val playPauseIntent = if (isPlaying) Intent(
+        val builder = MediaPlaybackServiceHelper.showNotification(isPlaying,
             applicationContext,
-            MediaPlaybackService::class.java
-        ).setAction("ACTION_PAUSE")
-        else Intent(applicationContext, MediaPlaybackService::class.java).setAction("ACTION_PLAY")
-        val nextIntent =
-            Intent(applicationContext, MediaPlaybackService::class.java).setAction("ACTION_NEXT")
-        val prevIntent = Intent(
-            applicationContext,
-            MediaPlaybackService::class.java
-        ).setAction("ACTION_PREVIOUS")
-        val intent = packageManager
-            .getLaunchIntentForPackage(packageName)
-            ?.setPackage(null)
-            ?.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
-        val activityIntent =
-            PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val builder = NotificationCompat.Builder(applicationContext, channelID).apply {
-            val controller = mMediaSessionCompat.controller
-            val mediaMetadata = controller.metadata
-            addAction(
-                NotificationCompat.Action(
-                    R.drawable.ic_back,
-                    getString(R.string.play_prev),
-                    PendingIntent.getService(
-                        applicationContext,
-                        0,
-                        prevIntent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-            )
-            val playOrPause = if (isPlaying) R.drawable.ic_pause
-            else R.drawable.ic_play
-            addAction(
-                NotificationCompat.Action(
-                    playOrPause,
-                    getString(R.string.play_pause),
-                    PendingIntent.getService(
-                        applicationContext, 0, playPauseIntent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-            )
-            addAction(
-                NotificationCompat.Action(
-                    R.drawable.ic_next,
-                    getString(R.string.play_next),
-                    PendingIntent.getService(
-                        applicationContext,
-                        0,
-                        nextIntent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-            )
-            setStyle(
-                androidx.media.app.NotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(0, 1, 2)
-                    .setMediaSession(mMediaSessionCompat.sessionToken)
-            )
-            val smallIcon = if (isPlaying) R.drawable.play
-            else R.drawable.pause
-
-            setSmallIcon(smallIcon)
-            setContentIntent(activityIntent)
-            setContentTitle(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE))
-            setContentText(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST))
-            setLargeIcon(mediaMetadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART))
-            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            priority = NotificationCompat.PRIORITY_DEFAULT
-        }
+            packageManager,packageName,
+        channelID,mMediaSessionCompat)
+//        val playPauseIntent = if (isPlaying) Intent(
+//            applicationContext,
+//            MediaPlaybackService::class.java
+//        ).setAction("ACTION_PAUSE")
+//        else Intent(applicationContext, MediaPlaybackService::class.java).setAction("ACTION_PLAY")
+//        val nextIntent =
+//            Intent(applicationContext, MediaPlaybackService::class.java).setAction("ACTION_NEXT")
+//        val prevIntent = Intent(
+//            applicationContext,
+//            MediaPlaybackService::class.java
+//        ).setAction("ACTION_PREVIOUS")
+//        val intent = packageManager
+//            .getLaunchIntentForPackage(packageName)
+//            ?.setPackage(null)
+//            ?.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+//        val activityIntent =
+//            PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+//        val builder = NotificationCompat.Builder(applicationContext, channelID).apply {
+//            val controller = mMediaSessionCompat.controller
+//            val mediaMetadata = controller.metadata
+//            addAction(
+//                NotificationCompat.Action(
+//                    R.drawable.ic_back,
+//                    getString(R.string.play_prev),
+//                    PendingIntent.getService(
+//                        applicationContext,
+//                        0,
+//                        prevIntent,
+//                        PendingIntent.FLAG_IMMUTABLE
+//                    )
+//                )
+//            )
+//            val playOrPause = if (isPlaying) R.drawable.ic_pause
+//            else R.drawable.ic_play
+//            addAction(
+//                NotificationCompat.Action(
+//                    playOrPause,
+//                    getString(R.string.play_pause),
+//                    PendingIntent.getService(
+//                        applicationContext, 0, playPauseIntent,
+//                        PendingIntent.FLAG_IMMUTABLE
+//                    )
+//                )
+//            )
+//            addAction(
+//                NotificationCompat.Action(
+//                    R.drawable.ic_next,
+//                    getString(R.string.play_next),
+//                    PendingIntent.getService(
+//                        applicationContext,
+//                        0,
+//                        nextIntent,
+//                        PendingIntent.FLAG_IMMUTABLE
+//                    )
+//                )
+//            )
+//            setStyle(
+//                androidx.media.app.NotificationCompat.MediaStyle()
+//                    .setShowActionsInCompactView(0, 1, 2)
+//                    .setMediaSession(mMediaSessionCompat.sessionToken)
+//            )
+//            val smallIcon = if (isPlaying) R.drawable.play
+//            else R.drawable.pause
+//
+//            setSmallIcon(smallIcon)
+//            setContentIntent(activityIntent)
+//            setContentTitle(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE))
+//            setContentText(mediaMetadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST))
+//            setLargeIcon(mediaMetadata.getBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART))
+//            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//            priority = NotificationCompat.PRIORITY_DEFAULT
+//        }
         startForeground(1, builder.build())
     }
 }

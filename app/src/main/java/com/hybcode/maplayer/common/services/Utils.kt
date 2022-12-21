@@ -1,11 +1,14 @@
 package com.hybcode.maplayer.common.services
 
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.support.v4.media.MediaMetadataCompat
+import androidx.core.app.NotificationCompat
 import com.hybcode.maplayer.R
 import com.hybcode.maplayer.common.domain.model.Song
 import java.io.File
@@ -67,3 +70,4 @@ private fun calculateInSampleSize(options: BitmapFactory.Options): Int {
     }
     return inSampleSize
 }
+
