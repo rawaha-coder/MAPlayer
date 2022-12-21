@@ -327,62 +327,63 @@ class MediaPlaybackService : MediaBrowserServiceCompat(), OnErrorListener {
     }
 
     private fun setCurrentMetadata() {
-        val metadata = MediaMetadataCompat.Builder().apply {
-            putString(
-                MediaMetadataCompat.METADATA_KEY_TITLE,
-                currentlyPlayingSong?.title
-            )
-            putString(
-                MediaMetadataCompat.METADATA_KEY_ARTIST,
-                currentlyPlayingSong?.artist
-            )
-            putString(
-                MediaMetadataCompat.METADATA_KEY_ALBUM,
-                currentlyPlayingSong?.album
-            )
-            putBitmap(
-                MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-                getArtwork(currentlyPlayingSong?.albumID) ?: BitmapFactory.decodeResource(
-                    application.resources,
-                    R.drawable.ic_launcher_foreground
-                )
-            )
-        }.build()
+//        val metadata = MediaMetadataCompat.Builder().apply {
+//            putString(
+//                MediaMetadataCompat.METADATA_KEY_TITLE,
+//                currentlyPlayingSong?.title
+//            )
+//            putString(
+//                MediaMetadataCompat.METADATA_KEY_ARTIST,
+//                currentlyPlayingSong?.artist
+//            )
+//            putString(
+//                MediaMetadataCompat.METADATA_KEY_ALBUM,
+//                currentlyPlayingSong?.album
+//            )
+//            putBitmap(
+//                MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
+//                getArtwork(currentlyPlayingSong?.albumID) ?: BitmapFactory.decodeResource(
+//                    application.resources,
+//                    R.drawable.ic_launcher_foreground
+//                )
+//            )
+//        }.build()
+        val metadata = getMediaMetadata(currentlyPlayingSong, application, applicationContext)
         mMediaSessionCompat.setMetadata(metadata)
     }
 
-    private fun getArtwork(albumArtwork: String?): Bitmap? {
-        try {
-            return BitmapFactory.Options().run {
-                inJustDecodeBounds = true
-                val cw = ContextWrapper(applicationContext)
-                val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
-                val f = File(directory, "$albumArtwork.jpg")
-                BitmapFactory.decodeStream(FileInputStream(f))
-                inSampleSize = calculateInSampleSize(this)
-                inJustDecodeBounds = false
-                BitmapFactory.decodeStream(FileInputStream(f))
-            }
-        } catch (ignore: FileNotFoundException) {
+//    private fun getArtwork(albumArtwork: String?): Bitmap? {
+//        try {
+//            return BitmapFactory.Options().run {
+//                inJustDecodeBounds = true
+//                val cw = ContextWrapper(applicationContext)
+//                val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
+//                val f = File(directory, "$albumArtwork.jpg")
+//                BitmapFactory.decodeStream(FileInputStream(f))
+//                inSampleSize = calculateInSampleSize(this)
+//                inJustDecodeBounds = false
+//                BitmapFactory.decodeStream(FileInputStream(f))
+//            }
+//        } catch (ignore: FileNotFoundException) {
+//
+//        }
+//        return null
+//    }
 
-        }
-        return null
-    }
-
-    private fun calculateInSampleSize(options: BitmapFactory.Options): Int {
-        val reqWidth = 100
-        val reqHeight = 100
-        val (height: Int, width: Int) = options.run { outHeight to outWidth }
-        var inSampleSize = 1
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight: Int = height / 2
-            val halfWidth: Int = width / 2
-            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-                inSampleSize *= 2
-            }
-        }
-        return inSampleSize
-    }
+//    private fun calculateInSampleSize(options: BitmapFactory.Options): Int {
+//        val reqWidth = 100
+//        val reqHeight = 100
+//        val (height: Int, width: Int) = options.run { outHeight to outWidth }
+//        var inSampleSize = 1
+//        if (height > reqHeight || width > reqWidth) {
+//            val halfHeight: Int = height / 2
+//            val halfWidth: Int = width / 2
+//            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+//                inSampleSize *= 2
+//            }
+//        }
+//        return inSampleSize
+//    }
 
     private fun showNotification(isPlaying: Boolean) {
         val playPauseIntent = if (isPlaying) Intent(
