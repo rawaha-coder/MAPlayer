@@ -25,11 +25,12 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hybcode.maplayer.R
 import com.hybcode.maplayer.common.domain.model.Song
+import com.hybcode.maplayer.common.utils.FileConstants.channelID
 import java.io.IOException
 
 class MediaPlaybackService : MediaBrowserServiceCompat(), OnErrorListener {
 
-    private val channelID = "music"
+    //private val channelID = "music"
     private var currentlyPlayingSong: Song? = null
     private val handler = Handler(Looper.getMainLooper())
     private val logTag = "AudioPlayer"
