@@ -48,7 +48,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.signature.ObjectKey
 import com.google.gson.GsonBuilder
 import com.hybcode.maplayer.common.presentation.MusicViewModel
-import com.hybcode.maplayer.common.data.MusicDatabase
+import com.hybcode.maplayer.common.data.db.MusicDatabase
 import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.common.services.MediaPlaybackService
 import com.hybcode.maplayer.common.utils.FileConstants.channelID

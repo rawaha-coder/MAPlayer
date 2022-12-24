@@ -5,6 +5,7 @@ buildscript {
         roomVersion = "2.4.3"
         navigationVersion = "2.5.3"
         lifecycleVersion = "2.5.1"
+        hilt_version = "2.37"
     }
 
     dependencies {

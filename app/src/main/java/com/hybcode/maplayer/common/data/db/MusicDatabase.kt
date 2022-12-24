@@ -1,9 +1,10 @@
-package com.hybcode.maplayer.common.data
+package com.hybcode.maplayer.common.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.hybcode.maplayer.common.data.dao.MusicDao
 import com.hybcode.maplayer.common.domain.model.Song
 
 @Database(entities = [Song::class], version = 1, exportSchema = false)
