@@ -30,6 +30,8 @@
     <string name="play_prev">Play previous</string>
     <string name="skip_ahead">Skip ahead a track</string>
     <string name="skip_back">Skip back a track</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
     <!-- library strings -->
     <string name="album_artwork">Album artwork</string>
     <string name="artist">Artist</string>
