@@ -32,7 +32,7 @@
                 android:value="" />
         </activity>
         <service
-            android:name=".common.services.MediaPlaybackService"
+            android:name=".common.domain.services.MusicMediaBrowserService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />

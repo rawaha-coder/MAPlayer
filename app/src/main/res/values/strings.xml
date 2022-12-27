@@ -65,4 +65,5 @@ to refresh.</string>
     <string name="transition_back">transition_back</string>
     <string name="transition_play">transition_play</string>
     <string name="transition_forward">transition_forward</string>
+    <string name="music_library_screen_label">music library</string>
 </resources>
