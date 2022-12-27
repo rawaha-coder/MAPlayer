@@ -21,6 +21,7 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
 import com.hybcode.maplayer.MainActivity
 import com.hybcode.maplayer.R
+import com.hybcode.maplayer.common.domain.utils.Constants.MEDIA_ROOT_ID
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.net.URL
@@ -55,7 +56,7 @@ class MusicMediaBrowserService: MediaBrowserServiceCompat(),
         clientUid: Int,
         rootHints: Bundle?
     ): BrowserRoot? {
-        return BrowserRoot(MUSIC_PLAYER_EMPTY_ROOT_MEDIA_ID, null)
+        return BrowserRoot(MEDIA_ROOT_ID, null)
     }
 
     override fun onLoadChildren(
