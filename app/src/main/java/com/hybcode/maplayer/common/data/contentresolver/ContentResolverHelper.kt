@@ -1,6 +1,5 @@
 package com.hybcode.maplayer.common.data.contentresolver
 
-import android.app.Application
 import android.content.ContentUris
 import android.content.Context
 import android.content.ContextWrapper
@@ -11,11 +10,13 @@ import android.util.Log
 import android.util.Size
 import androidx.annotation.WorkerThread
 import com.hybcode.maplayer.common.domain.model.Song
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import javax.inject.Inject
 
-class ContentResolverHelper(private val application: Application) {
+class ContentResolverHelper @Inject constructor(@ApplicationContext val context: Context) {
 
     private val TAG = "ContentResolverHelper"
 
@@ -33,18 +34,18 @@ class ContentResolverHelper(private val application: Application) {
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.ALBUM,
-            MediaStore.Audio.Media.ALBUM_ID,
+            MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.YEAR
         )
 
-        val musicLibraryCursor = musicQuery(projection, application)
+        val musicLibraryCursor = musicQuery(projection, context)
         musicLibraryCursor?.use { cursor ->
             val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val trackColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK)
             val titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
             val artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)
-            val albumIDColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+            val durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val yearColumn = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.YEAR)
 
             cursor.apply {
@@ -79,19 +80,19 @@ class ContentResolverHelper(private val application: Application) {
                             val artist = cursor.getString(artistColumn) ?: "Unknown artist"
                             val album = cursor.getString(albumColumn) ?: "Unknown album"
                             val year = cursor.getString(yearColumn) ?: "2000"
-                            val albumID = cursor.getString(albumIDColumn) ?: "unknown_album_ID"
+                            val duration = cursor.getInt(durationColumn)
                             val uri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id)
                             val songUri = uri.toString()
-                            val file = getArtworkFile(albumID, application)
+                            val file = getArtworkFile(album, context)
                             if (!file.exists()) {
                                 val albumArt: Bitmap? = try {
-                                    application.contentResolver.loadThumbnail(uri, Size(640, 640), null)
+                                    context.contentResolver.loadThumbnail(uri, Size(640, 640), null)
                                 } catch (e: FileNotFoundException) {
                                     null
                                 }
                                 if (albumArt != null) saveImage(albumArt, file)
                             }
-                            songList += Song(id, track, title, artist, album, albumID, songUri, year)
+                            songList += Song(id, track, title, artist, album, duration, songUri, year)
                         }
                     }
                 }
@@ -101,10 +102,10 @@ class ContentResolverHelper(private val application: Application) {
     }
 
     private fun musicQuery(projection: Array<String>,
-                           application: Application): Cursor? {
+                           context: Context): Cursor? {
         val selection = MediaStore.Audio.Media.IS_MUSIC
         val sortOrder = MediaStore.Audio.Media.TITLE + " ASC"
-        return application.contentResolver.query(
+        return context.contentResolver.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
             projection,
             selection,
@@ -113,8 +114,8 @@ class ContentResolverHelper(private val application: Application) {
         )
     }
 
-    private fun getArtworkFile(filename: String, application: Application): File {
-        val cw = ContextWrapper(application)
+    private fun getArtworkFile(filename: String, context: Context): File {
+        val cw = ContextWrapper(context)
         val directory = cw.getDir("albumArt", Context.MODE_PRIVATE)
         return File(directory, "$filename.jpg")
     }

@@ -10,12 +10,6 @@ import com.hybcode.maplayer.R
 
 class MusicLibraryFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MusicLibraryFragment()
-    }
-
-    private lateinit var viewModel: MusicLibraryViewModel
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -23,10 +17,5 @@ class MusicLibraryFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_music_library, container, false)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MusicLibraryViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
 
 }

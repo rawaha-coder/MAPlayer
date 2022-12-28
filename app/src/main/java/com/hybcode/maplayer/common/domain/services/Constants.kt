@@ -1,4 +1,4 @@
-package com.hybcode.maplayer.common.domain.utils
+package com.hybcode.maplayer.common.domain.services
 
 object Constants {
     const val PLAYBACK_NOTIFICATION_CHANNEL_ID = "playback_notification_channel_id"
