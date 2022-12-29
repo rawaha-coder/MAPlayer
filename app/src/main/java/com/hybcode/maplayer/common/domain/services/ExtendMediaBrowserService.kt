@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.hybcode.maplayer.R
+import com.hybcode.maplayer.common.domain.exoplayer.MediaPlayerNotificationManager
 import com.hybcode.maplayer.common.domain.exoplayer.MediaSource
 import com.hybcode.maplayer.common.domain.services.Constants.MEDIA_ROOT_ID
 import com.hybcode.maplayer.common.domain.services.Constants.REFRESH_MEDIA_PLAY_ACTION
@@ -32,7 +33,7 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PlayerMediaBrowserService : MediaBrowserServiceCompat() {
+class ExtendMediaBrowserService : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var dataSourceFactory: CacheDataSource.Factory
@@ -56,7 +57,7 @@ class PlayerMediaBrowserService : MediaBrowserServiceCompat() {
     var isForegroundService: Boolean = false
 
     companion object {
-        private const val TAG = "PlayerMediaBrowserService"
+        private const val TAG = "ExtendMediaBrowserService"
         var currentDuration: Long = 0L
             private set
     }
@@ -185,7 +186,7 @@ class PlayerMediaBrowserService : MediaBrowserServiceCompat() {
                     applicationContext,
                     Intent(
                         applicationContext,
-                        this@PlayerMediaBrowserService.javaClass
+                        this@ExtendMediaBrowserService.javaClass
                     )
                 )
                 startForeground(notificationId, notification)

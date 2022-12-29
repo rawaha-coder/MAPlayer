@@ -33,7 +33,7 @@
                 android:value="" />
         </activity>
         <service
-            android:name=".common.domain.services.PlayerMediaBrowserService"
+            android:name=".common.domain.services.ExtendMediaBrowserService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
