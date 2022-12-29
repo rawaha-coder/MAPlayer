@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_playback_controls"
-    app:startDestination="@id/PlaybackControls">
+    app:startDestination="@id/NavPlaybackControls">
 
     <fragment
-        android:id="@+id/PlaybackControls"
+        android:id="@+id/NavPlaybackControls"
         android:name="com.hybcode.maplayer.common.presentation.PlaybackControlsFragment"
         android:label=""
         tools:layout="@layout/fragment_playback_controls" />

@@ -2,12 +2,13 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/NavMusicLibrary">
+    android:id="@+id/nav_music_library"
+    app:startDestination="@id/NavSongs">
 
     <fragment
-        android:id="@+id/NavMusicLibrary"
-        android:name="com.hybcode.maplayer.musiclibrary.MusicLibraryFragment"
+        android:id="@+id/NavSongs"
+        android:name="com.hybcode.maplayer.songs.SongsFragment"
         android:label="@string/music_library_screen_label"
-        tools:layout="@layout/fragment_music_library" />
+        tools:layout="@layout/fragment_songs" />
+
 </navigation>

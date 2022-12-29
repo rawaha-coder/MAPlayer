@@ -80,4 +80,6 @@ to refresh.</string>
     <string name="play_list">Play Lists</string>
     <string name="artist_library">Artists</string>
     <string name="album_library">Albums</string>
+    <string name="nav_to_songs_fragment">To Songs Fragment</string>
+    <string name="nav_to_playback_fragment">To playback fragment</string>
 </resources>
