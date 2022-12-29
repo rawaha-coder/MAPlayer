@@ -76,4 +76,8 @@ to refresh.</string>
     <string name="generic_error">The application has encountered an unexpected error.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="music_library">All Songs</string>
+    <string name="play_list">Play Lists</string>
+    <string name="artist_library">Artists</string>
+    <string name="album_library">Albums</string>
 </resources>

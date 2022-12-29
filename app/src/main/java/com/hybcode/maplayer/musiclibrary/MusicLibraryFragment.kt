@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import com.hybcode.maplayer.databinding.FragmentMusicLibraryBinding
 
 class MusicLibraryFragment : Fragment() {
@@ -19,14 +18,5 @@ class MusicLibraryFragment : Fragment() {
     ): View {
         _binding = FragmentMusicLibraryBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        updateScreenState()
-    }
-
-    private fun updateScreenState() {
-        binding.progressBar.isVisible = true
     }
 }

@@ -1,37 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_animals_near_you_container"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_music_library_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".musiclibrary.MusicLibraryFragment">
 
-    <com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:fastScrollAutoHide="true"
-        app:fastScrollAutoHideDelay="1500"
-        app:fastScrollTrackColor="@android:color/transparent"
-        app:fastScrollThumbInactiveColor="@color/design_default_color_primary"
-        app:fastScrollEnableThumbInactiveColor="true"
-        app:fastScrollPopupBackgroundSize="62dp"
-        app:fastScrollPopupBgColor="@color/design_default_color_primary"
-        app:fastScrollPopupPosition="adjacent"
-        app:fastScrollPopupTextColor="@android:color/white"
-        app:fastScrollPopupTextSize="32dp"
-        app:fastScrollPopupTextVerticalAlignmentMode="font_metrics"
-        app:fastScrollThumbColor="@color/design_default_color_primary"
-        app:fastScrollThumbEnabled="true" />
+        android:layout_marginBottom="84dp"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playback_controls_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:navGraph="@navigation/nav_playback_controls" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
