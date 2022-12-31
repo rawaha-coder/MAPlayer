@@ -3,15 +3,25 @@ package com.hybcode.maplayer.common
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
+import androidx.navigation.NavGraph
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.navigation.NavigationView
+import com.hybcode.maplayer.NavGraphDirections
 import com.hybcode.maplayer.R
 import com.hybcode.maplayer.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,73 +33,10 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
-    private val navController by lazy { findNavController(R.id.nav_host_fragment) }
-    private val appBarConfiguration by lazy { AppBarConfiguration(topLevelDestinationIds = setOf(
-        R.id.NavMusicLibrary, R.id.NavSongs, R.id.NavPlaybackControls)) }
-
-    private var isNavHostFragmentVisible = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        hideFragment()
-        setupActionBar()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    override fun onBackPressed() {
-        if (isNavHostFragmentVisible){
-            hideFragment()
-            showNavButton()
-        }
-        else super.onBackPressed()
-    }
-
-    private fun setupActionBar() {
-        setSupportActionBar(binding.toolbar)
-        //setupActionBarWithNavController(navController, appBarConfiguration)
-    }
-
-    private fun hideFragment() {
-        val fragmentManager = supportFragmentManager
-        val fragment = fragmentManager.findFragmentById(R.id.nav_host_fragment)
-        fragment?.let {
-            fragmentManager.beginTransaction()
-                .hide(it)
-                .commit()
-        }
-        isNavHostFragmentVisible = false
-    }
-
-    private fun showFragment(){
-        hideNavButton()
-        val fragmentManager = supportFragmentManager
-        val fragment = fragmentManager.findFragmentById(R.id.nav_host_fragment)
-        fragment?.let {
-            fragmentManager.beginTransaction()
-                .show(it)
-                .commit()
-        }
-        isNavHostFragmentVisible = true
-    }
-
-    private fun hideNavButton() {
-        binding.musicLibraryButton.visibility = View.GONE
-        binding.playListButton.visibility = View.GONE
-        binding.albumLibraryButton.visibility = View.GONE
-        binding.artistLibraryButton.visibility = View.GONE
-    }
-
-    private fun showNavButton() {
-        binding.musicLibraryButton.visibility = View.VISIBLE
-        binding.playListButton.visibility = View.VISIBLE
-        binding.albumLibraryButton.visibility = View.VISIBLE
-        binding.artistLibraryButton.visibility = View.VISIBLE
     }
 
     override fun onResume() {
@@ -112,15 +59,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             toast(getString(R.string.permission_required))
             finish()
-        }
-    }
-
-    fun buttonPressed(view: View) {
-        when(view){
-            binding.musicLibraryButton -> showFragment()
-            binding.playListButton -> showFragment()
-            binding.artistLibraryButton -> showFragment()
-            binding.albumLibraryButton -> showFragment()
         }
     }
 

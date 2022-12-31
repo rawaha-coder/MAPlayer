@@ -1,10 +1,12 @@
 package com.hybcode.maplayer.common.presentation
 
+import android.support.v4.media.session.PlaybackStateCompat.*
 import android.support.v4.media.MediaBrowserCompat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hybcode.maplayer.common.data.repository.SongRepository
@@ -22,8 +24,16 @@ class SongViewModel @Inject constructor(
     private val repository: SongRepository,
     serviceConnection: MediaPlayerServiceConnection
 ) : ViewModel() {
+
+    var currentlyPlayingSong = MutableLiveData<Song?>()
+    var isPlaying = MutableLiveData<Boolean>()
+    var currentPlaybackPosition = MutableLiveData<Int>()
+    var currentPlaybackDuration = MutableLiveData<Int>()
+    private var playState = STATE_STOPPED
+
+    //new val
     var songList = mutableStateListOf<Song>()
-    val currentPlayingAudio = serviceConnection.currentPlayingSong
+    val currentPlayingSong = serviceConnection.currentPlayingSong
     private val isConnected = serviceConnection.isConnected
     lateinit var rootMediaId: String
     var currentPlayBackPosition by mutableStateOf(0L)
@@ -48,11 +58,11 @@ class SongViewModel @Inject constructor(
     val currentDuration:Long
         get() = ExtendMediaBrowserService.currentDuration
 
-    var currentAudioProgress = mutableStateOf(0f)
+    var currentSongProgress = mutableStateOf(0f)
 
     init {
         viewModelScope.launch {
-            songList += getAndFormatSongData()
+            songList += repository.getSongData() //getAndFormatSongData()
             isConnected.collect {
                 if (it) {
                     rootMediaId = serviceConnection.rootMediaId
@@ -79,7 +89,7 @@ class SongViewModel @Inject constructor(
 
     fun playMedia(currentSong: Song) {
         serviceConnection.playMedia(songList)
-        if (currentSong.songID == currentPlayingAudio.value?.songID) {
+        if (currentSong.songID == currentPlayingSong.value?.songID) {
             if (isSongPlaying) {
                 serviceConnection.transportControl.pause()
             } else {
@@ -91,6 +101,14 @@ class SongViewModel @Inject constructor(
                     currentSong.songID.toString(),
                     null
                 )
+        }
+    }
+
+    fun playPauseControl(){
+        when (playState) {
+            STATE_PAUSED -> serviceConnection.transportControl.play()
+            STATE_PLAYING -> serviceConnection.transportControl.pause()
+            else -> {Unit }
         }
     }
 
@@ -129,7 +147,7 @@ class SongViewModel @Inject constructor(
             }
 
             if (currentDuration > 0) {
-                currentAudioProgress.value = (
+                currentSongProgress.value = (
                         currentPlayBackPosition.toFloat()
                                 / currentDuration.toFloat() * 100f
                         )

@@ -1,27 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_music_library_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".musiclibrary.MusicLibraryFragment">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/music_library_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <Button
+        android:id="@+id/all_songs_button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="84dp"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_music_library" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/music_library" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/playback_controls_fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <Button
+        android:id="@+id/play_list_button"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:navGraph="@navigation/nav_playback_controls" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/play_list" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <Button
+        android:id="@+id/artist_library_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/artist_library" />
+
+    <Button
+        android:id="@+id/album_library_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/album_library" />
+
+</LinearLayout>

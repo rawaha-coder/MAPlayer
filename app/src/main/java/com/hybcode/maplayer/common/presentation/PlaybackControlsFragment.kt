@@ -5,56 +5,60 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
 import com.hybcode.maplayer.R
+import com.hybcode.maplayer.common.domain.model.Song
+import com.hybcode.maplayer.databinding.FragmentPlaybackControlsBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PlaybackControlsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PlaybackControlsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var _binding: FragmentPlaybackControlsBinding? = null
+    private val binding get() = _binding!!
+
+    private val songViewModel: SongViewModel by viewModels()
+    private var currentlyPlayingSong: Song? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_playback_controls, container, false)
+    ): View {
+        _binding = FragmentPlaybackControlsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PlaybackControlsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PlaybackControlsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+//// get information about the currently playing song
+//        songViewModel.currentlyPlayingSong.observe(viewLifecycleOwner) { song ->
+//            song?.let {
+//                currentlyPlayingSong = it
+//                binding.title.text = it.title
+//                binding.album.text = it.album
+//                binding.artist.text = it.artist
+//            }
+//        }
+//// check whether a song is currently playing
+//        songViewModel.isPlaying.observe(viewLifecycleOwner) { playing ->
+//            playing?.let {
+//                if (it) binding.btnPlay.setImageResource(R.drawable.ic_pause)
+//                else binding.btnPlay.setImageResource(R.drawable.ic_play)
+//            }
+//        }
+//// keep track of currently playing song duration
+//        songViewModel.currentPlaybackDuration.observe(viewLifecycleOwner) { duration ->
+//            duration?.let {
+//                binding.songProgressBar.max = it
+//                binding.currentMax.text = SimpleDateFormat("mm:ss", Locale.UK).format(it)
+//            }
+//        }
+//// keep track of currently playing song position
+//        songViewModel.currentPlaybackPosition.observe(viewLifecycleOwner) { position ->
+//            position?.let {
+//                binding.songProgressBar.progress = position
+//                binding.currentPosition.text = SimpleDateFormat("mm:ss", Locale.UK).format(it)
+//            }
+//        }
     }
+
 }

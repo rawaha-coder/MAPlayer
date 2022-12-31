@@ -4,18 +4,52 @@
     android:layout_width="match_parent"
     android:background="?attr/selectableItemBackground"
     android:layout_gravity="bottom">
-    <ProgressBar
-        android:id="@+id/songProgressBar"
+
+    <LinearLayout
+        android:id="@+id/progressView"
         android:layout_width="match_parent"
-        android:layout_height="4dp"
-        style="?android:attr/progressBarStyleHorizontal" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ProgressBar
+            android:id="@+id/songProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginBottom="4dp"
+            style="?android:attr/progressBarStyleHorizontal" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/currentPosition"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="4dp"
+                android:textSize="14sp"
+                android:text="00:00"
+                android:textColor="@color/material_on_surface_emphasis_medium" />
+            <TextView
+                android:id="@+id/currentMax"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="4dp"
+                android:gravity="end"
+                android:textSize="14sp"
+                android:text="00:00"
+                android:textColor="@color/material_on_surface_emphasis_medium" />
+        </LinearLayout>
+
+    </LinearLayout>
     <ImageView
         android:id="@+id/artwork"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:contentDescription="@string/set_album_artwork"
         android:transitionName="@string/transition_image"
-        android:layout_below="@id/songProgressBar"
+        android:src="@drawable/ic_music_note"
+        android:layout_below="@id/progressView"
         android:layout_alignParentStart="true" />
     <LinearLayout
         android:layout_width="0dp"
@@ -56,7 +90,7 @@
         android:id="@+id/btnBackward"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_back"
+        android:src="@drawable/ic_baseline_skip_previous_24"
         android:transitionName="@string/transition_back"
         android:contentDescription="@string/skip_back"
         android:layout_centerVertical="true"
@@ -77,7 +111,7 @@
         android:id="@+id/btnForward"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_next"
+        android:src="@drawable/ic_baseline_skip_next_24"
         android:transitionName="@string/transition_forward"
         android:contentDescription="@string/skip_ahead"
         android:layout_centerVertical="true"
