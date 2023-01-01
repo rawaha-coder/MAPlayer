@@ -1,31 +1,30 @@
 package com.hybcode.maplayer.musiclibrary
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bumptech.glide.Glide.init
-import com.hybcode.maplayer.common.data.contentresolver.ContentResolverHelper
 import com.hybcode.maplayer.common.data.repository.SongRepository
+import com.hybcode.maplayer.common.domain.exoplayer.MediaPlayerServiceConnection
 import com.hybcode.maplayer.common.domain.model.Song
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class MusicLibraryViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class MusicLibraryViewModel @Inject constructor (
+    private val repository: SongRepository,
+    serviceConnection: MediaPlayerServiceConnection
+) : ViewModel() {
     private val _allSongs: MutableLiveData<List<Song>> = MutableLiveData<List<Song>>()
     val allSongs: LiveData<List<Song>> get() = _allSongs
-    private val repository: SongRepository
-    private val cr: ContentResolverHelper
+
     init {
-        cr = ContentResolverHelper(application)
-        repository = SongRepository(cr)
-        getSongList()
+        viewModelScope.launch {
+            _allSongs.value = repository.getSongData()
+        }
     }
 
-    fun getSongList() = viewModelScope.launch {
-        _allSongs.value = repository.getSongData()
-    }
+
 }

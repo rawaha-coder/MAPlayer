@@ -44,9 +44,9 @@ class MediaSource
                 .putString(
                     MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
                     song.songID.toString()
-                ).putString(
+                ).putLong(
                     MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,
-                    song.track.toString()
+                    song.track.toLong()
                 ).putString(
                     MediaMetadataCompat.METADATA_KEY_TITLE,
                     song.title

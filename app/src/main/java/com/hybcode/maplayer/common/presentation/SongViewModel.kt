@@ -25,11 +25,11 @@ class SongViewModel @Inject constructor(
     serviceConnection: MediaPlayerServiceConnection
 ) : ViewModel() {
 
-    var currentlyPlayingSong = MutableLiveData<Song?>()
-    var isPlaying = MutableLiveData<Boolean>()
-    var currentPlaybackPosition = MutableLiveData<Int>()
-    var currentPlaybackDuration = MutableLiveData<Int>()
-    private var playState = STATE_STOPPED
+//    var currentlyPlayingSong = MutableLiveData<Song?>()
+//    var isPlaying = MutableLiveData<Boolean>()
+//    var currentPlaybackPosition = MutableLiveData<Int>()
+//    var currentPlaybackDuration = MutableLiveData<Int>()
+//    private var playState = STATE_STOPPED
 
     //new val
     var songList = mutableStateListOf<Song>()
@@ -104,13 +104,13 @@ class SongViewModel @Inject constructor(
         }
     }
 
-    fun playPauseControl(){
-        when (playState) {
-            STATE_PAUSED -> serviceConnection.transportControl.play()
-            STATE_PLAYING -> serviceConnection.transportControl.pause()
-            else -> {Unit }
-        }
-    }
+//    fun playPauseControl(){
+//        when (playState) {
+//            STATE_PAUSED -> serviceConnection.transportControl.play()
+//            STATE_PLAYING -> serviceConnection.transportControl.pause()
+//            else -> {Unit }
+//        }
+//    }
 
     fun stopPlayBack() {
         serviceConnection.transportControl.stop()

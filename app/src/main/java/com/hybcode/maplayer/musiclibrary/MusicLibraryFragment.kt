@@ -16,12 +16,14 @@ import com.hybcode.maplayer.NavGraphDirections
 import com.hybcode.maplayer.R
 import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.FragmentMusicLibraryBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MusicLibraryFragment : Fragment() {
 
     private var _binding : FragmentMusicLibraryBinding? = null
     private val binding get() = _binding!!
-    private lateinit var musicLibraryViewModel: MusicLibraryViewModel //by viewModels()
+    private val musicLibraryViewModel: MusicLibraryViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,7 +36,6 @@ class MusicLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        musicLibraryViewModel = ViewModelProvider(this)[MusicLibraryViewModel::class.java]
         binding.loadSongsProgressBar.isVisible = true
 
         musicLibraryViewModel.allSongs.observe(viewLifecycleOwner) { songs ->
