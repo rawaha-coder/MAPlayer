@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hybcode.maplayer.common.domain.model.Song
 import com.hybcode.maplayer.databinding.SongPreviewBinding
 
-class SongsAdapter(private val fragment: SongsFragment): RecyclerView.Adapter<SongsAdapter.SongsViewHolder>() {
+class SongsAdapter(): RecyclerView.Adapter<SongsAdapter.SongsViewHolder>() {
 
     var songs = mutableListOf<Song>()
 
@@ -28,7 +28,7 @@ class SongsAdapter(private val fragment: SongsFragment): RecyclerView.Adapter<So
         val song: Song = songs[position]
         holder.bind(song)
         holder.itemView.setOnClickListener {
-            fragment.playNewSongs(song)
+            //fragment.playNewSongs(song)
         }
     }
 
