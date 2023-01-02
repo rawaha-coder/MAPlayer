@@ -45,16 +45,13 @@ class SongsFragment : Fragment() {
         binding.loadSongsProgressBar.isVisible = true
         binding.songsRecyclerView.layoutManager = LinearLayoutManager(activity)
         binding.songsRecyclerView.itemAnimator = DefaultItemAnimator()
-        songsAdapter = SongsAdapter()
+        songsAdapter = SongsAdapter(this)
         binding.songsRecyclerView.adapter = songsAdapter
         musicLibraryViewModel.allSongs.observe(viewLifecycleOwner) { songs ->
                 songs?.let {
                     if (it.isNotEmpty()){
-
-                        songsAdapter.songs = it.toMutableList()
-                        songsAdapter.notifyDataSetChanged()
+                        processSongs(it)
                         binding.loadSongsProgressBar.visibility = View.GONE
-                        Toast.makeText(context, "${it.size.toString()}", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -93,6 +90,8 @@ class SongsFragment : Fragment() {
         }
     }
 
-    //fun playNewSongs(song: Song) = songViewModel.playMedia(song)
+    fun playNewSongs(song: Song){
+        musicLibraryViewModel.playMedia(song)
+    }
 
 }
